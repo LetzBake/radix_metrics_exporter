@@ -4,13 +4,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/jeremywohl/flatten"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/jeremywohl/flatten"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/tidwall/gjson"
 )
 
 var (
@@ -138,11 +139,13 @@ func systemEpochproof(baseUrl string) {
 	result := gjson.GetBytes(body, "header.nextValidators.#.stake")
 
 	nextValidators := result.Array()
-	minStake, maxStake := minMax(nextValidators)
+	if len(nextValidators) > 0 {
+		minStake, maxStake := minMax(nextValidators)
 
-	radix_validator_next_validators_count.Set(float64(len(nextValidators)))
-	radix_validator_next_validators_stake_min.Set((minStake / 1e18))
-	radix_validator_next_validators_stake_max.Set((maxStake / 1e18))
+		radix_validator_next_validators_count.Set(float64(len(nextValidators)))
+		radix_validator_next_validators_stake_min.Set((minStake / 1e18))
+		radix_validator_next_validators_stake_max.Set((maxStake / 1e18))
+	}
 }
 
 func nodeValidator(baseUrl string) {
